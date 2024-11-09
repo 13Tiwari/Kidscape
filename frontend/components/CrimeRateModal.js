@@ -1,7 +1,13 @@
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
 
-const CrimeRateModal = ({ visible, message, onClose }) => {
+const CrimeRateModal = ({ visible, location, crimePercentage, onClose }) => {
+  const getBackgroundColor = (percentage) => {
+    if (percentage >= 80) return '#4CAF50'; 
+    if (percentage >= 50) return '#FFEB3B';
+    return '#F44336'; 
+  };
+
   return (
     <Modal
       animationType="slide"
@@ -11,8 +17,19 @@ const CrimeRateModal = ({ visible, message, onClose }) => {
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalText}>This town has:</Text>
-          <Text style={styles.modalText}>{message || 'Default Message'}</Text>
+          <Text style={styles.modalText}>CRIME RATE REPORT</Text>
+          <Text style={styles.modalText}>{location}</Text>
+          <View
+            style={[
+              styles.crimeCircle,
+              {
+                backgroundColor: getBackgroundColor(crimePercentage),
+              },
+            ]}
+          >
+            <Text style={styles.crimePercentageText}>{crimePercentage}%</Text>
+          </View>
+
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>
@@ -40,7 +57,7 @@ const styles = StyleSheet.create({
   },
   modalText: {
     fontSize: 18,
-    color: 'black', // Ensure text color is visible
+    color: 'black',
     marginBottom: 20,
   },
   closeButton: {
@@ -52,5 +69,18 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: 'white',
     fontSize: 16,
+  },
+  crimeCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  crimePercentageText: {
+    color: 'black',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });

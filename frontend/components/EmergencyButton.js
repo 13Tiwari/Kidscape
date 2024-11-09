@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'react-native-paper';
 
-const CustomButton = ({ title, onPress, mode = 'contained', icon, color = '#6200ee' }) => {
+const EmergencyButton = ({ title, onPress, mode = 'contained', icon, color = '#6200ee' }) => {
   return (
     <Button
       mode={mode}               
@@ -13,8 +13,10 @@ const CustomButton = ({ title, onPress, mode = 'contained', icon, color = '#6200
         fontWeight: 'bold',      
       }}
       style={{
-        borderRadius: 30,        
-        margin: 10,              
+        borderRadius: 10,        
+        height: 50,
+        width: '45%',
+        justifyContent: 'center',              
       }}
     >
       {title}                    
@@ -22,4 +24,4 @@ const CustomButton = ({ title, onPress, mode = 'contained', icon, color = '#6200
   );
 };
 
-export default CustomButton;
+export default EmergencyButton;
