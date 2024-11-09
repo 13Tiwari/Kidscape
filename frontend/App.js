@@ -4,7 +4,8 @@ import CustomButton from './components/Button';
 import EmergencyButton from './components/EmergencyButton';
 import CrimeRateModal from './components/CrimeRateModal';
 import ReportingModal from './components/ReportingModal'; 
-import LocationMap from './components/LocationMap'; 
+import LocationMap from './components/LocationMap';
+import { TOKEN } from '@env'; 
 
 const AppScreen = () => {
   const [crimeRateModalVisible, setCrimeRateModalVisible] = useState(false);
@@ -16,7 +17,7 @@ const AppScreen = () => {
 
     // Fetch city in App.js
     useEffect(() => {
-      fetch('https://ipinfo.io/json?token=2dfecacbc07752') 
+      fetch(`https://ipinfo.io/json?token=${TOKEN}`) 
         .then(response => response.json())
         .then(data => {
           if (data.city) {

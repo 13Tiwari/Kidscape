@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'; 
 import { View, StyleSheet } from 'react-native'; 
 import MapView, { Marker } from 'react-native-maps';
+import { TOKEN } from '@env';
 
 const LocationMap = () => {
   const [location, setLocation] = useState({
@@ -15,7 +16,7 @@ const LocationMap = () => {
   });
 
   useEffect(() => {
-    fetch('https://ipinfo.io/json?token=2dfecacbc07752') 
+    fetch(`https://ipinfo.io/json?token=${TOKEN}`) 
       .then(response => response.json())
       .then(data => {
         if (data.loc) {
