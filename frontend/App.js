@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';  
-import { Image, View, StyleSheet, Text } from 'react-native'; 
+import { Image, View, StyleSheet, Text, Modal, Button } from 'react-native'; 
 import CustomButton from './components/Button';
 import EmergencyButton from './components/EmergencyButton';
 import AddContactButton from './components/AddContactButton';
@@ -13,7 +13,7 @@ import axios from 'axios';
 const AppScreen = () => {
   const [crimeRateModalVisible, setCrimeRateModalVisible] = useState(false);
   const [reportingModalVisible, setReportingModalVisible] = useState(false);
-  const [buttonName, setButtonName] = useState('');
+  const [emergencyContactsModalVisible, setEmergencyContactsModalVisible] = useState(false);
   const [city, setCity] = useState(''); 
   const [region, setRegion] = useState(''); 
   const [country, setCountry] = useState(''); 
@@ -60,11 +60,12 @@ const AppScreen = () => {
   }, []);
 
   const handlePress = (name) => {
-    setButtonName(name);
     if (name === 'Crime Rate') {
       setCrimeRateModalVisible(true);
     } else if (name === 'Reporting') {
       setReportingModalVisible(true);
+    } else if (name === 'Emergency Contacts') {
+      setEmergencyContactsModalVisible(true);
     }
   };
 
@@ -73,6 +74,8 @@ const AppScreen = () => {
       setCrimeRateModalVisible(false);
     } else if (name === 'Reporting') {
       setReportingModalVisible(false);
+    } else if (name === 'Emergency Contacts') {
+      setEmergencyContactsModalVisible(false); // Corrected this line
     }
   };
 
@@ -114,7 +117,7 @@ const AppScreen = () => {
       />
 
       <EmergencyContactsModal
-        visible={reportingModalVisible}
+        visible={emergencyContactsModalVisible}
         onClose={() => closeModal('Emergency Contacts')}
       />
 
@@ -149,7 +152,10 @@ const AppScreen = () => {
         </View>
       )}
 
-      <AddContactButton title="Emergency Contacts" />
+      <AddContactButton
+        title="Emergency Contacts"
+        onPress={() => setEmergencyContactsModalVisible(true)} // Corrected this line
+      />
     </View>
   );
 };
