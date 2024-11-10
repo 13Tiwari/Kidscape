@@ -44,12 +44,14 @@ const EmergencyContactModal = ({ visible, onClose }) => {
   };
 
   const handleAddContact = () => {
-    if (name && phone) {
+    if (name.trim() && phone.trim()) {
       const newContact = { name, phone };
       const updatedContacts = [...contacts, newContact];
       saveContacts(updatedContacts);
       setName('');
       setPhone('');
+    } else {
+      alert('Please enter both name and phone number.');
     }
   };
 
