@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';  
 import { Image, View, StyleSheet, Text } from 'react-native'; 
 import CustomButton from './components/Button';
 import EmergencyButton from './components/EmergencyButton';
+import AddContactButton from './components/AddContactButton';
 import CrimeRateModal from './components/CrimeRateModal';
 import ReportingModal from './components/ReportingModal'; 
 import LocationMap from './components/LocationMap';
 import { TOKEN } from '@env'; 
+import axios from 'axios';
 
 const AppScreen = () => {
   const [crimeRateModalVisible, setCrimeRateModalVisible] = useState(false);
@@ -14,35 +16,39 @@ const AppScreen = () => {
   const [city, setCity] = useState(''); 
   const [region, setRegion] = useState(''); 
   const [country, setCountry] = useState(''); 
+  const [notificationVisible, setNotificationVisible] = useState(false);
+  const [safetyScore, setSafetyScore] = useState(null);
 
-    // Fetch city in App.js
-    useEffect(() => {
-      fetch(`https://ipinfo.io/json?token=${TOKEN}`) 
-        .then(response => response.json())
-        .then(data => {
-          if (data.city) {
-            setCity(data.city); 
-          } else {
-            setCity('Unknown City'); 
-          }
+  useEffect(() => {
+    const fetchSafetyScore = async () => {
+      try {
+        // Use your machine's IP address or 'localhost' if you're using an emulator
+        const response = await axios.get('http://10.29.26.230:5000/api/safety');
+        console.log('Safety Score Data:', response.data);
+        // Set the safety score from the backend response
+        setSafetyScore(response.data.safety_score);
+      } catch (error) {
+        console.error('Error fetching safety score:', error);
+      }
+    };
 
-          if (data.region) {
-            setRegion(data.region); 
-          } else {
-            setRegion('Unknown Region'); 
-          }
+    fetchSafetyScore();
+}, []);
 
-          if (data.country) {
-            setCountry(data.country); 
-          } else {
-            setCountry('Unknown Region'); 
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching location:', error);
-          setCity('Error fetching city'); 
-        });
-    }, []);
+  // Fetch city using IP info API
+  useEffect(() => {
+    fetch(`https://ipinfo.io/json?token=${TOKEN}`) 
+      .then(response => response.json())
+      .then(data => {
+        setCity(data.city || 'Unknown City');
+        setRegion(data.region || 'Unknown Region');
+        setCountry(data.country || 'Unknown Region');
+      })
+      .catch(error => {
+        console.error('Error fetching location:', error);
+        setCity('Error fetching city'); 
+      });
+  }, []);
 
   const handlePress = (name) => {
     setButtonName(name);
@@ -61,6 +67,13 @@ const AppScreen = () => {
     }
   };
 
+  const handleUnsafePress = () => {
+    setNotificationVisible(true); // Show the notification
+    setTimeout(() => {
+      setNotificationVisible(false); // Hide it after 1 second
+    }, 1000); // Timeout duration (1 second)
+  };
+
   return (
     <View style={styles.container}>
       <Image source={require('./assets/Logo.png')} style={styles.logo} />
@@ -69,13 +82,11 @@ const AppScreen = () => {
           title="Crime Rate"
           onPress={() => handlePress('Crime Rate')}
           mode="contained"
-          color="#ff5722"
         />
         <CustomButton
           title="Reporting"
           onPress={() => handlePress('Reporting')}
           mode="contained"
-          color="#ff5722"
         />
       </View>
 
@@ -83,7 +94,7 @@ const AppScreen = () => {
         visible={crimeRateModalVisible}
         location={`${city}, ${region}, ${country}`}
         onClose={() => closeModal('Crime Rate')}
-        crimePercentage={95}
+        crimePercentage={`${safetyScore}`} 
       />
 
       <ReportingModal
@@ -97,29 +108,33 @@ const AppScreen = () => {
       <View style={styles.emergencyButtonContainer}>
         <View style={styles.buttonRow}>
           <EmergencyButton
-            title="Emergency 1"
-            onPress={() => console.log('Button 1 pressed')}
-            color="#FF5733"
+            title="Unsafe"
+            onPress={handleUnsafePress} // Call handleUnsafePress on press
           />
           <EmergencyButton
-            title="Emergency 2"
+            title="Uncomfortable"
             onPress={() => console.log('Button 2 pressed')}
-            color="#FF5733"
           />
         </View>
         <View style={styles.buttonRow}>
           <EmergencyButton
-            title="Emergency 3"
+            title="Medical Emergency"
             onPress={() => console.log('Button 3 pressed')}
-            color="#FF5733"
           />
           <EmergencyButton
-            title="Emergency 4"
+            title="Help"
             onPress={() => console.log('Button 4 pressed')}
-            color="#FF5733"
           />
         </View>
       </View>
+
+      {notificationVisible && (
+        <View style={styles.notification}>
+          <Text style={styles.notificationText}>Notification sent</Text>
+        </View>
+      )}
+
+      <AddContactButton title="Emergency Contacts" />
     </View>
   );
 };
@@ -127,19 +142,19 @@ const AppScreen = () => {
 export default AppScreen;
 
 const styles = StyleSheet.create({
-  logo: {
-    width: 200, 
-    height: 200, 
-    alignSelf: 'center',
-    resizeMode: 'contain', 
-  },
   container: {
     flex: 1,
-    marginTop: 50,
     justifyContent: 'top',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFFDD0',
+  },
+  logo: {
+    width: 200, 
+    height: 150, 
+    alignSelf: 'center',
+    resizeMode: 'contain',
   },
   buttonContainer: {
+    paddingTop: 0,
     flexDirection: 'row',
     justifyContent: 'center',
   },
@@ -155,5 +170,19 @@ const styles = StyleSheet.create({
   },
   emergencyButtonContainer: {
     marginTop: 20,
+  },
+  notification: {
+    position: 'absolute',
+    bottom: '30%',
+    backgroundColor: 'black',
+    alignSelf: 'center',
+    padding: 10,
+    borderRadius: 5,
+    zIndex: 1000,
+  },
+  notificationText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

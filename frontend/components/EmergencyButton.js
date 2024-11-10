@@ -1,15 +1,15 @@
 import React from 'react';
 import { Button } from 'react-native-paper';
 
-const EmergencyButton = ({ title, onPress, mode = 'contained', icon, color = '#6200ee' }) => {
+const EmergencyButton = ({ title, onPress, mode = 'contained', icon, color = '#244a1c' }) => {
   return (
     <Button
       mode={mode}               
       icon={icon}               
       onPress={onPress}         
-      color={color}             
+      buttonColor={color}             
       labelStyle={{
-        fontSize: 16,            
+        fontSize: 14,            
         fontWeight: 'bold',      
       }}
       style={{

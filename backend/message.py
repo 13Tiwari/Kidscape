@@ -1,7 +1,13 @@
 from twilio.rest import Client
+from dotenv import load_dotenv
+import os
 
-account_sid = ''
-auth_token = ''
+load_dotenv()
+ACCOUNT_SID = os.getenv("ACCOUNT_SID")
+AUTH_TOKEN = os.getenv("AUTH_TOKEN")
+
+account_sid = ACCOUNT_SID
+auth_token = AUTH_TOKEN
 client = Client(account_sid, auth_token)
 
 message = client.messages.create(

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native'; 
 import MapView, { Marker } from 'react-native-maps';
 import { TOKEN } from '@env';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const LocationMap = () => {
   const [location, setLocation] = useState({
@@ -56,10 +57,46 @@ const LocationMap = () => {
         >
           <Marker
             coordinate={{
+              latitude: 40.349496,
+              longitude: -74.657365,
+            }}
+            title="Warning: Dangerous Area"
+          >
+            <View style={{
+              backgroundColor: 'yellow',
+              padding: 5,
+              borderRadius: 20,
+              borderWidth: 2,
+              borderColor: 'orange',
+            }}>
+              <MaterialIcons name="warning" size={24} color="black" />
+            </View>
+          </Marker>
+
+          <Marker
+            coordinate={{
+              latitude: 40.344000,
+              longitude: -74.660000,
+            }}
+            title="Warning: Dangerous Area"
+          >
+            <View style={{
+              backgroundColor: 'yellow',
+              padding: 5,
+              borderRadius: 20,
+              borderWidth: 2,
+              borderColor: 'orange',
+            }}>
+              <MaterialIcons name="warning" size={24} color="black" />
+            </View>
+          </Marker>
+
+          <Marker
+            coordinate={{
               latitude: location.latitude,
               longitude: location.longitude,
             }}
-            title="Current Location"
+            title="Current location"
           />
         </MapView>
       </View>
