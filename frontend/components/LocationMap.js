@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'; 
-import { View, StyleSheet } from 'react-native'; 
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { TOKEN } from '@env';
 import { MaterialIcons } from '@expo/vector-icons';
+import * as FileSystem from 'expo-file-system';
+import { TOKEN } from '@env';
 
 const LocationMap = () => {
   const [location, setLocation] = useState({
@@ -11,26 +12,27 @@ const LocationMap = () => {
   });
 
   const [zoomLevel, setZoomLevel] = useState({
-    // Default zoom level
     latitudeDelta: 0.0922, 
     longitudeDelta: 0.0421, 
   });
 
+  const [incidents, setIncidents] = useState([]);
+
   useEffect(() => {
-    fetch(`https://ipinfo.io/json?token=${TOKEN}`) 
+    // Fetch the current location of the user
+    fetch(`https://ipinfo.io/json?token=${TOKEN}`)
       .then(response => response.json())
       .then(data => {
         if (data.loc) {
-          const [latitude, longitude] = data.loc.split(','); 
+          const [latitude, longitude] = data.loc.split(',');
           setLocation({
             latitude: parseFloat(latitude),
             longitude: parseFloat(longitude),
           });
 
           setZoomLevel({
-            // Zoom in closer for the current location
-            latitudeDelta: 0.02, 
-            longitudeDelta: 0.02, 
+            latitudeDelta: 0.02,
+            longitudeDelta: 0.02,
           });
         } else {
           console.error('Location data not found');
@@ -38,6 +40,25 @@ const LocationMap = () => {
       })
       .catch(error => {
         console.error('Error fetching location:', error);
+      });
+
+    // Read incidents from the local file
+    const filePath = FileSystem.documentDirectory + 'incidents.json';
+    FileSystem.readAsStringAsync(filePath)
+      .then(fileContents => {
+        const existingData = JSON.parse(fileContents);
+        
+        // Ensure that latitude and longitude are numbers
+        const updatedIncidents = existingData.map(incident => ({
+          ...incident,
+          latitude: parseFloat(incident.latitude),   // Ensure latitude is a number
+          longitude: parseFloat(incident.longitude), // Ensure longitude is a number
+        }));
+
+        setIncidents(updatedIncidents);  // Set incidents data for markers
+      })
+      .catch(error => {
+        console.error('Error reading incidents data:', error);
       });
   }, []);
 
@@ -55,42 +76,23 @@ const LocationMap = () => {
           showsUserLocation={true}
           showsMyLocationButton={true}
         >
-          <Marker
-            coordinate={{
-              latitude: 40.349496,
-              longitude: -74.657367,
-            }}
-            title="Warning: Dangerous Area"
-          >
-            <View style={{
-              backgroundColor: 'yellow',
-              padding: 5,
-              borderRadius: 20,
-              borderWidth: 2,
-              borderColor: 'orange',
-            }}>
-              <MaterialIcons name="warning" size={24} color="black" />
-            </View>
-          </Marker>
+          {/* Loop through incidents and add a marker for each */}
+          {incidents.map((incident, index) => (
+            <Marker
+              key={index}
+              coordinate={{
+                latitude: incident.latitude,
+                longitude: incident.longitude,
+              }}
+              title={`${incident.description}`}
+            >
+              <View style={styles.dangerMarker}>
+                <MaterialIcons name="warning" size={24} color="black" />
+              </View>
+            </Marker>
+          ))}
 
-          <Marker
-            coordinate={{
-              latitude: 40.343899,
-              longitude: -74.660049,
-            }}
-            title="Warning: Dangerous Area"
-          >
-            <View style={{
-              backgroundColor: 'yellow',
-              padding: 5,
-              borderRadius: 20,
-              borderWidth: 2,
-              borderColor: 'orange',
-            }}>
-              <MaterialIcons name="warning" size={24} color="black" />
-            </View>
-          </Marker>
-
+          {/* Marker for current location */}
           <Marker
             coordinate={{
               latitude: location.latitude,
@@ -114,12 +116,19 @@ const styles = StyleSheet.create({
   mapContainer: {
     width: '95%',
     height: '100%',
-    borderWidth: 2,                
-    borderColor: '#4CAF50',       
-    borderRadius: 20,             
-    overflow: 'hidden',             
+    borderWidth: 2,
+    borderColor: '#4CAF50',
+    borderRadius: 20,
+    overflow: 'hidden',
   },
   map: {
     flex: 1,
+  },
+  dangerMarker: {
+    backgroundColor: 'yellow',
+    padding: 5,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: 'orange',
   },
 });

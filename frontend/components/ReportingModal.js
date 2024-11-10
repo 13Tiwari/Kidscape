@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 
-const CustomModal = ({ visible, message, latitude, longitude, onClose }) => {
+const CustomModal = ({ visible, latitude, longitude, onClose }) => {
   const [description, setDescription] = useState('');
 
   const handleSaveAndClose = async () => {
@@ -24,7 +24,7 @@ const CustomModal = ({ visible, message, latitude, longitude, onClose }) => {
       }
 
       existingData.push(data);
-
+      console.log('Incident data:', existingData);
       // Write the new data back to the file
       await FileSystem.writeAsStringAsync(filePath, JSON.stringify(existingData), { encoding: FileSystem.EncodingType.UTF8 });
       setDescription('');
@@ -43,6 +43,7 @@ const CustomModal = ({ visible, message, latitude, longitude, onClose }) => {
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
+          <Text style={styles.modalText}>REPORT AN INCIDENT</Text>
           <Text style={styles.modalText}>Latitude: {latitude}</Text>
           <Text style={styles.modalText}>Longitude: {longitude}</Text>
           <TextInput

@@ -5,6 +5,7 @@ import EmergencyButton from './components/EmergencyButton';
 import AddContactButton from './components/AddContactButton';
 import CrimeRateModal from './components/CrimeRateModal';
 import ReportingModal from './components/ReportingModal'; 
+import EmergencyContactsModal from './components/EmergencyContactsModal'; 
 import LocationMap from './components/LocationMap';
 import { TOKEN } from '@env'; 
 import axios from 'axios';
@@ -107,10 +108,14 @@ const AppScreen = () => {
 
       <ReportingModal
         visible={reportingModalVisible}
-        message={`${buttonName} button was pressed!`}
         latitude={`${latitude}`}
         longitude={`${longitude}`}
         onClose={() => closeModal('Reporting')}
+      />
+
+      <EmergencyContactsModal
+        visible={reportingModalVisible}
+        onClose={() => closeModal('Emergency Contacts')}
       />
 
       <LocationMap latitude={latitude} longitude={longitude} />
