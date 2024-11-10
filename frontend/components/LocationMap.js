@@ -58,7 +58,7 @@ const LocationMap = () => {
           <Marker
             coordinate={{
               latitude: 40.349496,
-              longitude: -74.657365,
+              longitude: -74.657367,
             }}
             title="Warning: Dangerous Area"
           >
@@ -75,8 +75,8 @@ const LocationMap = () => {
 
           <Marker
             coordinate={{
-              latitude: 40.344000,
-              longitude: -74.660000,
+              latitude: 40.343899,
+              longitude: -74.660049,
             }}
             title="Warning: Dangerous Area"
           >

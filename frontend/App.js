@@ -16,16 +16,16 @@ const AppScreen = () => {
   const [city, setCity] = useState(''); 
   const [region, setRegion] = useState(''); 
   const [country, setCountry] = useState(''); 
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
   const [notificationVisible, setNotificationVisible] = useState(false);
   const [safetyScore, setSafetyScore] = useState(null);
 
   useEffect(() => {
     const fetchSafetyScore = async () => {
       try {
-        // Use your machine's IP address or 'localhost' if you're using an emulator
         const response = await axios.get('http://10.29.26.230:5000/api/safety');
         console.log('Safety Score Data:', response.data);
-        // Set the safety score from the backend response
         setSafetyScore(response.data.safety_score);
       } catch (error) {
         console.error('Error fetching safety score:', error);
@@ -33,16 +33,24 @@ const AppScreen = () => {
     };
 
     fetchSafetyScore();
-}, []);
+  }, []);
 
-  // Fetch city using IP info API
+  // Fetch location using IP info API
   useEffect(() => {
     fetch(`https://ipinfo.io/json?token=${TOKEN}`) 
       .then(response => response.json())
       .then(data => {
         setCity(data.city || 'Unknown City');
         setRegion(data.region || 'Unknown Region');
-        setCountry(data.country || 'Unknown Region');
+        setCountry(data.country || 'Unknown Country');
+        
+        if (data.loc) {
+          const [lat, lon] = data.loc.split(',');
+          setLatitude(parseFloat(lat));
+          setLongitude(parseFloat(lon));
+        } else {
+          console.error('Location data not found');
+        }
       })
       .catch(error => {
         console.error('Error fetching location:', error);
@@ -68,10 +76,10 @@ const AppScreen = () => {
   };
 
   const handleUnsafePress = () => {
-    setNotificationVisible(true); // Show the notification
+    setNotificationVisible(true);
     setTimeout(() => {
-      setNotificationVisible(false); // Hide it after 1 second
-    }, 1000); // Timeout duration (1 second)
+      setNotificationVisible(false);
+    }, 1000);
   };
 
   return (
@@ -100,16 +108,18 @@ const AppScreen = () => {
       <ReportingModal
         visible={reportingModalVisible}
         message={`${buttonName} button was pressed!`}
+        latitude={`${latitude}`}
+        longitude={`${longitude}`}
         onClose={() => closeModal('Reporting')}
       />
 
-      <LocationMap />
+      <LocationMap latitude={latitude} longitude={longitude} />
 
       <View style={styles.emergencyButtonContainer}>
         <View style={styles.buttonRow}>
           <EmergencyButton
             title="Unsafe"
-            onPress={handleUnsafePress} // Call handleUnsafePress on press
+            onPress={handleUnsafePress}
           />
           <EmergencyButton
             title="Uncomfortable"
